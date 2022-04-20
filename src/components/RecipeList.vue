@@ -1,6 +1,9 @@
 <template>
   <div class="recipe-list">
-    <RecipeCard v-for="recipe in props.recipeList" :recipe="recipe" :key="recipe.id"></RecipeCard>
+    <RecipeCard v-for="recipe in props.recipeList"
+                :recipe="recipe"
+                :key="recipe.id"
+                @delete-recipe="(id) => $emit('delete-recipe',id)"></RecipeCard>
   </div>
 </template>
 

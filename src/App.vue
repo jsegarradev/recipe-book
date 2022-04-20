@@ -5,10 +5,11 @@
       <span class="app-name">Recipe book</span>
     </div>
     <div class="content">
-<!--      <TestElement :primary="true"></TestElement>-->
       <SearchBar></SearchBar>
-      <RecipeList :recipeList="recipes"></RecipeList>
+      <RecipeList :recipeList="recipes" @delete-recipe="deleteRecipe"></RecipeList>
       <RecipeForm :hidden="!showModal"></RecipeForm>
+<!--      <ExerciseThree></ExerciseThree>-->
+<!--      <ExerciseFour></ExerciseFour>-->
     </div>
   </div>
 </template>
@@ -21,8 +22,8 @@ import RecipeList from "@/components/RecipeList.vue";
 import RecipeForm from "@/components/RecipeForm.vue";
 import {Recipe} from "@/model/Recipe";
 
-// import TestElement from "@/exercices-1-to-4/TestElement.vue";
-
+// import ExerciseThree from "@/components/ExerciseThree.vue";
+// import ExerciseFour from "@/components/ExerciseFour.vue";
 interface ComponentData {
   showModal: boolean,
   recipes: Recipe[]
@@ -34,7 +35,13 @@ export default defineComponent({
     SearchBar,
     RecipeList,
     RecipeForm,
-    // TestElement
+    // ExerciseThree
+    // ExerciseFour
+  },
+  methods: {
+    deleteRecipe(id:number){
+      this.recipes = this.recipes.filter(r => r.id !== id)
+    }
   },
   data(): ComponentData {
     return {

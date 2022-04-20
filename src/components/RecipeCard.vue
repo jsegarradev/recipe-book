@@ -1,6 +1,6 @@
 <template>
   <div class="recipe" :class="{featured: props.recipe.featured}">
-    <button class="delete-recipe">
+    <button @click="$emit('delete-recipe',props.recipe.id)" class="delete-recipe">
       <img src="../assets/delete-button.svg">
     </button>
     <h2 class="recipe-title">{{ props.recipe.title }}</h2>

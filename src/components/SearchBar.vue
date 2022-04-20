@@ -3,7 +3,6 @@
     <input type="text" id="search" name="search" placeholder="Search for a recipe">
     <button type="button">Add a new recipe</button>
   </div>
-
 </template>
 
 <script lang="ts">
@@ -11,6 +10,11 @@ import {defineComponent} from "vue";
 
 export default defineComponent({
   name: "SearchBar",
+  methods: {
+    console(){
+      console.log("a")
+    }
+  }
 })
 
 </script>

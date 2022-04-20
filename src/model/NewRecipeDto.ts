@@ -1,0 +1,1 @@
+export interface NewRecipeDto { [key: string]: string | string[] | boolean }

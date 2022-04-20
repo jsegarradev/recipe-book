@@ -21,25 +21,32 @@
           <input type="text" id="servings" name="servings">
         </div>
         <div class="recipe-form-item">
-          <label for="dedicationTime">Time:</label><br>
-          <input type="text" id="dedicationTime" name="dedicationTime">
+          <label for="time">Time:</label><br>
+          <input type="text" id="time" name="time">
         </div>
         <div class="recipe-form-item">
           <label for="difficulty">Difficulty:</label><br>
           <select id="difficulty" name="difficulty">
-            <option v-for="item in difficultyOptions" :key="item">{{item.value}}</option>
+            <option v-for="item in difficultyOptions" :key="item">{{ item.value }}</option>
           </select>
         </div>
         <div class="recipe-form-item">
           <label for="ingredients">Ingredients:</label><br>
-          <input type="text" id="ingredients" name="ingredients">
+          <textarea type="text" id="ingredients" name="ingredients"></textarea>
         </div>
         <div class="recipe-form-item">
           <label for="directions">Directions:</label><br>
-          <input type="text" id="directions" name="directions">
+          <textarea type="text" id="directions" name="directions"></textarea>
         </div>
         <div class="recipe-form-item">
-          <button type="submit" form="form" value="Submit">Submit</button>
+          <label for="featured">Featured recipe</label><br>
+          <input type="checkbox" id="featured" name="featured">
+        </div>
+        <div class="recipe-form-item">
+          <button @click.prevent="createRecipe" type="submit" form="form" value="Submit">Submit</button>
+        </div>
+        <div class="recipe-form-item">
+          <span :hidden="!error" style="color: red">Error: Form could not be submitted!</span>
         </div>
       </form>
     </div>
@@ -49,28 +56,59 @@
 <script lang="ts">
 import {defineComponent} from "vue";
 import {Difficulty} from "@/model/Difficulty";
+import {Recipe} from "@/model/Recipe";
+import {NewRecipeDto} from "@/model/NewRecipeDto";
 
 interface ComponentData {
-  difficultyOptions: {value:string}[]
+  difficultyOptions: { value: string }[],
+  error: boolean,
+  recipe: Recipe
 }
 
 export default defineComponent({
   name: "RecipeForm",
   data(): ComponentData {
     return {
-      difficultyOptions: []
+      difficultyOptions: [],
+      error: false,
+      recipe: {
+        id: 0, title: '', imageUrl: '', servings: 0, time: '',
+        difficulty: Difficulty.EASY, ingredients: [], directions: [], featured: false
+      }
     }
   },
   created() {
     this.buildDifficultyOptions();
   },
   methods: {
-    buildDifficultyOptions(){
+    buildDifficultyOptions() {
       this.difficultyOptions = [
         {value: Difficulty.HARD},
         {value: Difficulty.MEDIUM},
         {value: Difficulty.EASY}
       ]
+    },
+    createRecipe() {
+      Object.keys(this.recipe).forEach(k => this.recipe[k] = this.mapFormElementValue(k));
+      if(this.validInputs(this.recipe)){
+        return
+      }else {
+        this.error = true;
+      }
+    },
+    mapFormElementValue(key: string) {
+      if (key === 'id') return 0;
+      if (key === 'featured') {
+        return (document.getElementById(key) as HTMLInputElement).checked;
+      }
+      if (key === 'ingredients' || key === 'directions'){
+        return (document.getElementById(key) as HTMLInputElement).value.split('.');
+      } else {
+        return (document.getElementById(key) as HTMLInputElement).value
+      }
+    },
+    validInputs(recipe: Recipe): boolean {
+      return !(recipe.title || recipe.ingredients || recipe.directions).length < 0;
     }
   }
 })
@@ -127,7 +165,8 @@ export default defineComponent({
 }
 
 .recipe-form-item input,
-.recipe-form-item select {
+.recipe-form-item select,
+.recipe-form-item textarea {
   width: 100%;
   padding: 10px;
   border: 1px solid #ccc;
