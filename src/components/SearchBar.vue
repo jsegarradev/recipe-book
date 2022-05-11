@@ -15,32 +15,17 @@
   </div>
 </template>
 
-<script lang="ts">
-import {defineComponent} from "vue";
+<script setup lang="ts">
+import {ref, watch} from "vue";
 
-interface ComponentData {
-  search: string
-}
+let search = ref('');
 
-export default defineComponent({
-  name: "SearchBar",
-  data: (): ComponentData => ({
-    search: ''
-  }),
-  methods: {
-    showForm(): void {
-      this.$emit("show-form");
-    },
-    clearSearch(): void {
-      this.search = "";
-    },
-  },
-  watch: {
-    search(value): void {
-      this.$emit("search", value);
-    },
-  },
-})
+const emit = defineEmits(['search','show-form']);
+
+const clearSearch = () => search.value = '';
+const showForm = () => emit('show-form');
+
+watch( search, async (newValue) => emit('search',newValue));
 
 </script>
 

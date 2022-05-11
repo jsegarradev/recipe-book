@@ -30,7 +30,7 @@
         <div class="recipe-form-item">
           <label for="difficulty">Difficulty:</label><br>
           <select id="difficulty" name="difficulty" v-model="recipe.difficulty">
-            <option v-for="item in difficultyOptions" :key="item">{{ item.value }}</option>
+            <option v-for="item in difficultyOptions" :key="item">{{ item }}</option>
           </select>
         </div>
         <div class="recipe-form-item">
@@ -108,7 +108,6 @@ export default defineComponent({
       this.recipe.id = uuid();
       this.recipe.ingredients = this.rawIngredients.split(",");
       this.recipe.directions = this.rawDirections.split(",");
-      console.log(this.recipe);
       this.$emit("add-recipe", this.recipe);
       this.resetForm();
     },

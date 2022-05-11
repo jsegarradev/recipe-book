@@ -43,9 +43,7 @@
 <script setup lang="ts">
 import {Recipe} from "@/model/Recipe";
 
-interface Props {
-  recipe: Recipe
-}
+interface Props {recipe: Recipe}
 
 const props = defineProps<Props>();
 </script>

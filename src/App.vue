@@ -37,7 +37,6 @@ export default defineComponent({
     SearchBar,
     RecipeList,
     RecipeForm,
-
   },
   methods: {
     async getRecipes() {

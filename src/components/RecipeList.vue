@@ -16,8 +16,8 @@ interface Props {
     require: true
   }
 }
-
 const props = defineProps<Props>();
+
 </script>
 
 <script lang="ts">
