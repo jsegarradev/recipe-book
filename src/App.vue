@@ -19,11 +19,11 @@
 
 <script lang="ts">
 import {defineComponent} from "vue";
-import {Difficulty} from "@/model/Difficulty";
 import SearchBar from "@/components/SearchBar.vue";
 import RecipeList from "@/components/RecipeList.vue";
 import RecipeForm from "@/components/RecipeForm.vue";
 import {Recipe} from "@/model/Recipe";
+import axios from "axios";
 
 interface ComponentData {
   showModal: boolean,
@@ -40,12 +40,25 @@ export default defineComponent({
 
   },
   methods: {
-    addRecipe(recipe: Recipe): void {
-      this.recipes.push(recipe);
-      this.toggleForm();
+    async getRecipes() {
+      await axios.get('http://localhost:3000/recipes')
+          .then((response) => this.recipes = response.data.recipes)
+          .catch((error) => console.log(error));
     },
-    deleteRecipe(id: string): void {
-      this.recipes = this.recipes.filter(r => r.id !== id);
+    async addRecipe(recipe: Recipe) {
+      await axios.post('http://localhost:3000/recipe', recipe)
+          .then(() => console.log('Recipe created successfully'))
+          .catch((error) => console.log(`Error: ${error}`))
+          .finally(() => {
+            this.toggleForm();
+            this.getRecipes();
+          });
+    },
+    async deleteRecipe(id: string) {
+      await axios.delete('http://localhost:3000/recipe', {data: {id: id}})
+          .then(() => console.log(`Recipe ${id} deleted successfully`))
+          .catch((error) => console.log(`Error: ${error}`))
+          .finally(() => this.getRecipes());
     },
     toggleForm(): void {
       this.showModal = !this.showModal;
@@ -53,6 +66,9 @@ export default defineComponent({
     setSearchTerm(searchTerm: string) {
       this.searchTerm = searchTerm;
     },
+  },
+  created() {
+    this.getRecipes()
   },
   computed: {
     recipeListFiltered(): Recipe[] {
@@ -72,39 +88,7 @@ export default defineComponent({
     return {
       showModal: false,
       searchTerm: '',
-      recipes: [
-        {
-          id: '1',
-          title: "Flan de huevo",
-          imageUrl: "https://www.simplyrecipes.com/thmb/mbN8mXZ0srgAT1YrDU61183t0uM=/648x0/filters:no_upscale():max_bytes(150000):strip_icc():format(webp)/Simply-Recipes-Homemade-Pizza-Dough-Lead-Shot-1b-ea13798d224048b3a28afb0936c9b645.jpg",
-          servings: 4,
-          time: '30min',
-          difficulty: Difficulty.HARD,
-          ingredients: ['Harina', 'Huevo'],
-          directions: ['Clean your kitchen', 'Eat'],
-          featured: true
-        },
-        {
-          id: '2',
-          title: "Paella",
-          imageUrl: "https://www.simplyrecipes.com/thmb/7d0sunRXGIZmlgLft1k4MWJcBRw=/648x0/filters:no_upscale():max_bytes(150000):strip_icc():format(webp)/SimplyRecipes_Dakgangjeong_LEAD-5-b056c1dddb494f57892f65951915fdd8.jpg",
-          servings: 4,
-          time: '30min',
-          difficulty: Difficulty.HARD,
-          ingredients: ['Harina', 'Huevo'],
-          directions: ['Clean your kitchen', 'Eat']
-        },
-        {
-          id: '3',
-          title: "Arroz al horno",
-          imageUrl: "https://www.simplyrecipes.com/thmb/di-K0ibW-zy7M-IizHB5pXGvkPk=/648x0/filters:no_upscale():max_bytes(150000):strip_icc():format(webp)/Simply-Recipes-Philly-Cheesesteak-Casserole-LEAD-2-48c7b81c69dc4130afa58795f6f6646f.jpg",
-          servings: 4,
-          time: '30min',
-          difficulty: Difficulty.HARD,
-          ingredients: ['Harina', 'Huevo'],
-          directions: ['Clean your kitchen', 'Eat']
-        }
-      ],
+      recipes: [],
     }
   }
 })
