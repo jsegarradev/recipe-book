@@ -1,16 +1,19 @@
 <template>
   <div id="app">
     <div class="header">
-      <img src="./assets/uoc-logo.png" class="logo">
+      <img src="./assets/uoc-logo.png" class="logo" alt="UOC logo"/>
       <span class="app-name">Recipe book</span>
     </div>
-    <div class="content">
-      <SearchBar></SearchBar>
-      <RecipeList :recipeList="recipes" @delete-recipe="deleteRecipe"></RecipeList>
-      <RecipeForm :hidden="!showModal"></RecipeForm>
-<!--      <ExerciseThree></ExerciseThree>-->
-<!--      <ExerciseFour></ExerciseFour>-->
-    </div>
+
+    <SearchBar v-on:showForm="toggleForm"
+               v-on:search="setSearchTerm"/>
+
+    <RecipeList :recipeList="recipeListFiltered"
+                @delete-recipe="deleteRecipe"/>
+
+    <RecipeForm v-if="showModal"
+                v-on:addRecipe="addRecipe"
+                v-on:closeModal="toggleForm"/>
   </div>
 </template>
 
@@ -22,10 +25,9 @@ import RecipeList from "@/components/RecipeList.vue";
 import RecipeForm from "@/components/RecipeForm.vue";
 import {Recipe} from "@/model/Recipe";
 
-// import ExerciseThree from "@/components/ExerciseThree.vue";
-// import ExerciseFour from "@/components/ExerciseFour.vue";
 interface ComponentData {
   showModal: boolean,
+  searchTerm: string,
   recipes: Recipe[]
 }
 
@@ -35,20 +37,44 @@ export default defineComponent({
     SearchBar,
     RecipeList,
     RecipeForm,
-    // ExerciseThree
-    // ExerciseFour
+
   },
   methods: {
-    deleteRecipe(id:number){
-      this.recipes = this.recipes.filter(r => r.id !== id)
-    }
+    addRecipe(recipe: Recipe): void {
+      this.recipes.push(recipe);
+      this.toggleForm();
+    },
+    deleteRecipe(id: string): void {
+      this.recipes = this.recipes.filter(r => r.id !== id);
+    },
+    toggleForm(): void {
+      this.showModal = !this.showModal;
+    },
+    setSearchTerm(searchTerm: string) {
+      this.searchTerm = searchTerm;
+    },
+  },
+  computed: {
+    recipeListFiltered(): Recipe[] {
+      if (!this.searchTerm) {
+        return this.recipes;
+      }
+      return this.recipes.filter((recipe: Recipe) => {
+        return (
+            recipe.title.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
+            recipe.ingredients
+                .map((ingredient: string) => ingredient.toLowerCase())
+                .includes(this.searchTerm.toLowerCase()));
+      });
+    },
   },
   data(): ComponentData {
     return {
-      showModal: true,
+      showModal: false,
+      searchTerm: '',
       recipes: [
         {
-          id: 1,
+          id: '1',
           title: "Flan de huevo",
           imageUrl: "https://www.simplyrecipes.com/thmb/mbN8mXZ0srgAT1YrDU61183t0uM=/648x0/filters:no_upscale():max_bytes(150000):strip_icc():format(webp)/Simply-Recipes-Homemade-Pizza-Dough-Lead-Shot-1b-ea13798d224048b3a28afb0936c9b645.jpg",
           servings: 4,
@@ -59,8 +85,8 @@ export default defineComponent({
           featured: true
         },
         {
-          id: 2,
-          title: "Flan de huevo",
+          id: '2',
+          title: "Paella",
           imageUrl: "https://www.simplyrecipes.com/thmb/7d0sunRXGIZmlgLft1k4MWJcBRw=/648x0/filters:no_upscale():max_bytes(150000):strip_icc():format(webp)/SimplyRecipes_Dakgangjeong_LEAD-5-b056c1dddb494f57892f65951915fdd8.jpg",
           servings: 4,
           time: '30min',
@@ -69,35 +95,14 @@ export default defineComponent({
           directions: ['Clean your kitchen', 'Eat']
         },
         {
-          id: 3,
-          title: "Flan de huevo",
+          id: '3',
+          title: "Arroz al horno",
           imageUrl: "https://www.simplyrecipes.com/thmb/di-K0ibW-zy7M-IizHB5pXGvkPk=/648x0/filters:no_upscale():max_bytes(150000):strip_icc():format(webp)/Simply-Recipes-Philly-Cheesesteak-Casserole-LEAD-2-48c7b81c69dc4130afa58795f6f6646f.jpg",
           servings: 4,
           time: '30min',
           difficulty: Difficulty.HARD,
           ingredients: ['Harina', 'Huevo'],
           directions: ['Clean your kitchen', 'Eat']
-        },
-        {
-          id: 4,
-          title: "Flan de huevo",
-          imageUrl: "https://www.simplyrecipes.com/thmb/oFDeEmLMjdUr1wJrLFHFnNxHOmE=/648x0/filters:no_upscale():max_bytes(150000):strip_icc():format(webp)/Temp-filename_-13-3bcd9c723b3444529950b8f2718130fb.jpg",
-          servings: 4,
-          time: '30min',
-          difficulty: Difficulty.HARD,
-          ingredients: ['Harina', 'Huevo'],
-          directions: ['Clean your kitchen', 'Eat']
-        },
-        {
-          id: 5,
-          title: "Flan de huevo",
-          imageUrl: "https://www.simplyrecipes.com/thmb/QE9_crwCVlAuHFrL8RHPcEYBOyM=/648x0/filters:no_upscale():max_bytes(150000):strip_icc():format(webp)/Simply-Recipes-Vegetarian-Moussaka-LEAD-02-343afbc655ff48deb921bc27752b3b84.jpg",
-          servings: 4,
-          time: '30min',
-          difficulty: Difficulty.HARD,
-          ingredients: ['Harina', 'Huevo'],
-          directions: ['Clean your kitchen', 'Eat'],
-          featured: true
         }
       ],
     }

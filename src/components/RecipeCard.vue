@@ -1,11 +1,11 @@
 <template>
   <div class="recipe" :class="{featured: props.recipe.featured}">
-    <button @click="$emit('delete-recipe',props.recipe.id)" class="delete-recipe">
+    <button v-on:click="deleteRecipe(props.recipe.id)" class="delete-recipe">
       <img src="../assets/delete-button.svg">
     </button>
     <h2 class="recipe-title">{{ props.recipe.title }}</h2>
     <div class="recipe-image">
-      <img :src="props.recipe.imageUrl">
+      <img :src="props.recipe.imageUrl"/>
     </div>
     <div class="recipe-info">
       <div class="recipe-info-item">
@@ -55,6 +55,11 @@ import {defineComponent} from "vue";
 
 export default defineComponent({
   name: "RecipeCard",
+  methods: {
+    deleteRecipe(recipeId: string) {
+      this.$emit("delete-recipe", recipeId);
+    },
+  },
 })
 </script>
 

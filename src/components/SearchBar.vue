@@ -1,20 +1,45 @@
 <template>
   <div class="search">
-    <input type="text" id="search" name="search" placeholder="Search for a recipe">
-    <button type="button">Add a new recipe</button>
+    <input v-model="search"
+           placeholder="Search for a recipe"
+           id="search" name="search"
+           type="text"/>
+
+    <button v-if="search.length"
+            v-on:click="clearSearch"
+            type="button"
+    >
+      Clear search
+    </button>
+    <button v-on:click="showForm">Add a new recipe</button>
   </div>
 </template>
 
 <script lang="ts">
 import {defineComponent} from "vue";
 
+interface ComponentData {
+  search: string
+}
+
 export default defineComponent({
   name: "SearchBar",
+  data: (): ComponentData => ({
+    search: ''
+  }),
   methods: {
-    console(){
-      console.log("a")
-    }
-  }
+    showForm(): void {
+      this.$emit("show-form");
+    },
+    clearSearch(): void {
+      this.search = "";
+    },
+  },
+  watch: {
+    search(value): void {
+      this.$emit("search", value);
+    },
+  },
 })
 
 </script>
@@ -27,9 +52,11 @@ export default defineComponent({
   align-items: center;
   border-bottom: 1px solid #ccc;
   margin-bottom: 25px;
+  justify-content: space-between;
 }
+
 .search input {
-  width: 100%;
+  width: 500px;
   padding: 10px;
   border: 1px solid #ccc;
   border-radius: 4px;
@@ -37,6 +64,7 @@ export default defineComponent({
   margin: 0 auto;
   max-width: 500px;
 }
+
 .search button {
   margin-left: 10px;
   padding: 10px;

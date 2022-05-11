@@ -3,50 +3,50 @@
     <div class="recipe-form">
       <div class="recipe-form-header">
         <h2>Add a new recipe</h2>
-        <button class="delete-recipe">
-          <img src="../assets/close-button.svg">
+        <button v-on:click="closeForm">
+          <img src="../assets/close-button.svg" alt="Close modal"/>
         </button>
       </div>
-      <form id="form">
+      <div class="error" v-if="error">
+        The fields name, ingredients and directions are required.
+      </div>
+      <form v-on:submit.prevent="addRecipe" id="form">
         <div class="recipe-form-item">
           <label for="title">Title:</label><br>
-          <input type="text" id="title" name="title">
+          <input type="text" id="title" name="title" v-model="recipe.title">
         </div>
         <div class="recipe-form-item">
           <label for="imageUrl">Image URL:</label>
-          <input type="text" id="imageUrl" name="imageUrl">
+          <input type="text" id="imageUrl" name="imageUrl" v-model="recipe.imageUrl">
         </div>
         <div class="recipe-form-item">
           <label for="servings">Portions:</label>
-          <input type="text" id="servings" name="servings">
+          <input type="text" id="servings" name="servings" v-model="recipe.servings">
         </div>
         <div class="recipe-form-item">
           <label for="time">Time:</label><br>
-          <input type="text" id="time" name="time">
+          <input type="text" id="time" name="time" v-model="recipe.time">
         </div>
         <div class="recipe-form-item">
           <label for="difficulty">Difficulty:</label><br>
-          <select id="difficulty" name="difficulty">
+          <select id="difficulty" name="difficulty" v-model="recipe.difficulty">
             <option v-for="item in difficultyOptions" :key="item">{{ item.value }}</option>
           </select>
         </div>
         <div class="recipe-form-item">
           <label for="ingredients">Ingredients:</label><br>
-          <textarea type="text" id="ingredients" name="ingredients"></textarea>
+          <textarea type="text" id="ingredients" name="ingredients" v-model="rawIngredients"></textarea>
         </div>
         <div class="recipe-form-item">
           <label for="directions">Directions:</label><br>
-          <textarea type="text" id="directions" name="directions"></textarea>
+          <textarea type="text" id="directions" name="directions" v-model="rawDirections"></textarea>
         </div>
         <div class="recipe-form-item">
           <label for="featured">Featured recipe</label><br>
-          <input type="checkbox" id="featured" name="featured">
+          <input type="checkbox" id="featured" name="featured" v-model="recipe.featured">
         </div>
         <div class="recipe-form-item">
-          <button @click.prevent="createRecipe" type="submit" form="form" value="Submit">Submit</button>
-        </div>
-        <div class="recipe-form-item">
-          <span :hidden="!error" style="color: red">Error: Form could not be submitted!</span>
+          <button type="submit">Add Recipe</button>
         </div>
       </form>
     </div>
@@ -57,11 +57,14 @@
 import {defineComponent} from "vue";
 import {Difficulty} from "@/model/Difficulty";
 import {Recipe} from "@/model/Recipe";
-import {NewRecipeDto} from "@/model/NewRecipeDto";
+import {v4 as uuid} from 'uuid';
 
 interface ComponentData {
   difficultyOptions: { value: string }[],
   error: boolean,
+  isEditing: boolean,
+  rawIngredients: string,
+  rawDirections: string,
   recipe: Recipe
 }
 
@@ -71,9 +74,18 @@ export default defineComponent({
     return {
       difficultyOptions: [],
       error: false,
+      isEditing: false,
+      rawIngredients: '',
+      rawDirections: '',
       recipe: {
-        id: 0, title: '', imageUrl: '', servings: 0, time: '',
-        difficulty: Difficulty.EASY, ingredients: [], directions: [], featured: false
+        id: '',
+        title: '',
+        imageUrl: '',
+        servings: 0,
+        time: '',
+        difficulty: Difficulty.EASY,
+        ingredients: [],
+        directions: []
       }
     }
   },
@@ -88,33 +100,44 @@ export default defineComponent({
         {value: Difficulty.EASY}
       ]
     },
-    createRecipe() {
-      Object.keys(this.recipe).forEach(k => this.recipe[k] = this.mapFormElementValue(k));
-      if(this.validInputs(this.recipe)){
-        return
-      }else {
-        this.error = true;
+    addRecipe() {
+      this.validateForm();
+      if (this.error) {
+        return;
+      }
+      this.recipe.id = uuid();
+      this.recipe.ingredients = this.rawIngredients.split(",");
+      this.recipe.directions = this.rawDirections.split(",");
+      console.log(this.recipe);
+      this.$emit("add-recipe", this.recipe);
+      this.resetForm();
+    },
+    validateForm() {
+      this.error = (
+          this.recipe.title.length === 0 ||
+          this.rawIngredients.length === 0 ||
+          this.rawDirections.length === 0)
+    },
+    resetForm(): void {
+      this.recipe = {
+        id: "",
+        title: "",
+        imageUrl: "",
+        servings: 0,
+        time: "",
+        difficulty: Difficulty.EASY,
+        ingredients: [],
+        directions: [],
       }
     },
-    mapFormElementValue(key: string) {
-      if (key === 'id') return 0;
-      if (key === 'featured') {
-        return (document.getElementById(key) as HTMLInputElement).checked;
-      }
-      if (key === 'ingredients' || key === 'directions'){
-        return (document.getElementById(key) as HTMLInputElement).value.split('.');
-      } else {
-        return (document.getElementById(key) as HTMLInputElement).value
-      }
+    closeForm() {
+      this.$emit("close-modal");
     },
-    validInputs(recipe: Recipe): boolean {
-      return !(recipe.title || recipe.ingredients || recipe.directions).length < 0;
-    }
   }
 })
 </script>
 
-<style lang="scss">
+<style scoped lang="scss">
 .modal-container {
   position: fixed;
   top: 0;
@@ -181,5 +204,10 @@ export default defineComponent({
   border: none;
   border-radius: 4px;
   cursor: pointer;
+}
+
+.error {
+  color: red;
+  margin-bottom: 20px;
 }
 </style>

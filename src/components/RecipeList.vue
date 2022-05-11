@@ -3,7 +3,7 @@
     <RecipeCard v-for="recipe in props.recipeList"
                 :recipe="recipe"
                 :key="recipe.id"
-                @delete-recipe="(id) => $emit('delete-recipe',id)"></RecipeCard>
+                v-on:delete-recipe="deleteRecipe"></RecipeCard>
   </div>
 </template>
 
@@ -26,8 +26,11 @@ import RecipeCard from "@/components/RecipeCard.vue";
 
 export default defineComponent({
   name: "RecipeList",
-  components: {
-    RecipeCard
+  components: {RecipeCard},
+  methods: {
+    deleteRecipe(recipeId:string) {
+      this.$emit("delete-recipe", recipeId);
+    },
   }
 })
 </script>

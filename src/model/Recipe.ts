@@ -1,7 +1,7 @@
 import {Difficulty} from "@/model/Difficulty";
 
 export interface Recipe {
-    id: number,
+    id: string,
     title: string,
     imageUrl: string,
     servings: number,
