@@ -10,22 +10,22 @@
     <div class="recipe-info">
       <div class="recipe-info-item">
         <span class="recipe-info-label">Portions</span>
-        <span class="recipe-info-value">{{props.recipe.servings}}</span>
+        <span class="recipe-info-value">{{ props.recipe.servings }}</span>
       </div>
       <div class="recipe-info-item">
         <span class="recipe-info-label">Preparation time</span>
-        <span class="recipe-info-value">{{props.recipe.time}}</span>
+        <span class="recipe-info-value">{{ props.recipe.time }}</span>
       </div>
       <div class="recipe-info-item">
         <span class="recipe-info-label">Difficulty</span>
-        <span class="recipe-info-value">{{props.recipe.difficulty}}</span>
+        <span class="recipe-info-value">{{ props.recipe.difficulty }}</span>
       </div>
     </div>
     <div class="recipe-ingredients">
       <h3 class="recipe-ingredients-title">Ingredients</h3>
       <ul class="recipe-ingredients-list">
         <li v-for="item in props.recipe.ingredients" :key="item">
-          {{item}}
+          {{ item }}
         </li>
       </ul>
     </div>
@@ -33,7 +33,7 @@
       <h3 class="recipe-directions-title">Directions</h3>
       <ul class="recipe-directions-list">
         <li v-for="item in props.recipe.directions" :key="item">
-          {{item}}
+          {{ item }}
         </li>
       </ul>
     </div>
@@ -41,24 +41,18 @@
 </template>
 
 <script setup lang="ts">
+
 import {Recipe} from "@/model/Recipe";
 
-interface Props {recipe: Recipe}
+interface Props {
+  recipe: Recipe
+}
 
 const props = defineProps<Props>();
-</script>
 
-<script lang="ts">
-import {defineComponent} from "vue";
+const emit = defineEmits(['delete-recipe']);
 
-export default defineComponent({
-  name: "RecipeCard",
-  methods: {
-    deleteRecipe(recipeId: string) {
-      this.$emit("delete-recipe", recipeId);
-    },
-  },
-})
+const deleteRecipe = (recipeId: string): void => emit('delete-recipe', recipeId);
 </script>
 
 <style scoped lang="scss">

@@ -53,87 +53,69 @@
   </div>
 </template>
 
-<script lang="ts">
-import {defineComponent} from "vue";
+<script setup lang="ts">
+import {Ref, ref} from "vue";
 import {Difficulty} from "@/model/Difficulty";
 import {Recipe} from "@/model/Recipe";
 import {v4 as uuid} from 'uuid';
 
-interface ComponentData {
-  difficultyOptions: { value: string }[],
-  error: boolean,
-  isEditing: boolean,
-  rawIngredients: string,
-  rawDirections: string,
-  recipe: Recipe
+const recipe: Ref<Recipe> = ref(
+    {
+      id: '',
+      title: '',
+      imageUrl: '',
+      servings: 0,
+      time: '',
+      difficulty: Difficulty.EASY,
+      ingredients: [],
+      directions: []
+    });
+
+const rawIngredients: Ref<string> = ref('');
+const rawDirections: Ref<string> = ref('');
+const difficultyOptions: { value: string }[] = [
+  {value: Difficulty.HARD},
+  {value: Difficulty.MEDIUM},
+  {value: Difficulty.EASY}
+];
+
+const error: Ref<boolean> = ref(false);
+
+const emit = defineEmits(['add-recipe', 'close-modal']);
+
+const validateForm = (): void => {
+  error.value = (
+      recipe.value.title.length === 0 ||
+      recipe.value.ingredients.length === 0 ||
+      recipe.value.directions.length === 0);
 }
 
-export default defineComponent({
-  name: "RecipeForm",
-  data(): ComponentData {
-    return {
-      difficultyOptions: [],
-      error: false,
-      isEditing: false,
-      rawIngredients: '',
-      rawDirections: '',
-      recipe: {
-        id: '',
-        title: '',
-        imageUrl: '',
-        servings: 0,
-        time: '',
-        difficulty: Difficulty.EASY,
-        ingredients: [],
-        directions: []
-      }
-    }
-  },
-  created() {
-    this.buildDifficultyOptions();
-  },
-  methods: {
-    buildDifficultyOptions() {
-      this.difficultyOptions = [
-        {value: Difficulty.HARD},
-        {value: Difficulty.MEDIUM},
-        {value: Difficulty.EASY}
-      ]
-    },
-    addRecipe() {
-      this.validateForm();
-      if (this.error) {
-        return;
-      }
-      this.recipe.id = uuid();
-      this.recipe.ingredients = this.rawIngredients.split(",");
-      this.recipe.directions = this.rawDirections.split(",");
-      this.$emit("add-recipe", this.recipe);
-      this.resetForm();
-    },
-    validateForm() {
-      this.error = (
-          this.recipe.title.length === 0 ||
-          this.rawIngredients.length === 0 ||
-          this.rawDirections.length === 0)
-    },
-    resetForm(): void {
-      this.recipe = {
-        id: "",
-        title: "",
-        imageUrl: "",
-        servings: 0,
-        time: "",
-        difficulty: Difficulty.EASY,
-        ingredients: [],
-        directions: [],
-      }
-    },
-    closeForm() {
-      this.$emit("close-modal");
-    },
+const addRecipe = (): void => {
+  validateForm();
+  if (!error.value) {
+    recipe.value.id = uuid();
+    recipe.value.ingredients = rawIngredients.value.split(',');
+    recipe.value.directions = rawDirections.value.split(',');
+    emit('add-recipe', recipe.value);
+    resetRecipe();
   }
-})
+}
+
+const resetRecipe = (): void => {
+  recipe.value = {
+    id: '',
+    title: '',
+    imageUrl: '',
+    servings: 0,
+    time: '',
+    difficulty: Difficulty.EASY,
+    ingredients: [],
+    directions: []
+  };
+}
+
+const closeForm = (): void => emit('close-modal');
+
 </script>
 
 <style scoped lang="scss">

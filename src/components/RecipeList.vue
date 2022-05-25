@@ -11,28 +11,15 @@
 import {Recipe} from "@/model/Recipe";
 
 interface Props {
-  recipeList: {
-    type: Recipe[],
-    require: true
-  }
+  recipeList: Recipe[]
 }
-const props = defineProps<Props>();
 
-</script>
+const props: Props = defineProps<Props>();
 
-<script lang="ts">
-import {defineComponent} from "vue";
-import RecipeCard from "@/components/RecipeCard.vue";
+const emit = defineEmits(['delete-recipe']);
 
-export default defineComponent({
-  name: "RecipeList",
-  components: {RecipeCard},
-  methods: {
-    deleteRecipe(recipeId:string) {
-      this.$emit("delete-recipe", recipeId);
-    },
-  }
-})
+const deleteRecipe = (recipeId: string): void => emit('delete-recipe', recipeId);
+
 </script>
 
 <style scoped lang="scss">

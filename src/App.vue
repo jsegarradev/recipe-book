@@ -8,7 +8,7 @@
     <SearchBar v-on:showForm="toggleForm"
                v-on:search="setSearchTerm"/>
 
-    <RecipeList :recipeList="recipeListFiltered"
+    <RecipeList :recipeList="filterRecipeList"
                 @delete-recipe="deleteRecipe"/>
 
     <RecipeForm v-if="showModal"
@@ -17,80 +17,70 @@
   </div>
 </template>
 
-<script lang="ts">
-import {defineComponent} from "vue";
-import SearchBar from "@/components/SearchBar.vue";
-import RecipeList from "@/components/RecipeList.vue";
-import RecipeForm from "@/components/RecipeForm.vue";
+<script setup lang="ts">
+import RecipeForm from "./components/RecipeForm.vue";
+import RecipeList from "./components/RecipeList.vue";
+import SearchBar from "./components/SearchBar.vue";
+import {onMounted, Ref, ref} from "vue";
 import {Recipe} from "@/model/Recipe";
 import axios from "axios";
 
-interface ComponentData {
-  showModal: boolean,
-  searchTerm: string,
-  recipes: Recipe[]
+const showModal: Ref<boolean> = ref(false);
+
+const searchTerm: Ref<string> = ref('');
+const recipes: Ref<Recipe[]> = ref([]);
+
+onMounted(async () => {
+  console.log("aaaa");
+  await getRecipes();
+});
+
+const getRecipes = async (): Promise<void> => {
+  await axios.get('http://localhost:3000/recipes')
+      .then((response) => {
+        recipes.value = response.data.recipes;
+        console.log(recipes.value)
+      })
+      .catch((error) => console.log(error));
 }
 
-export default defineComponent({
-  name: 'App',
-  components: {
-    SearchBar,
-    RecipeList,
-    RecipeForm,
-  },
-  methods: {
-    async getRecipes() {
-      await axios.get('http://localhost:3000/recipes')
-          .then((response) => this.recipes = response.data.recipes)
-          .catch((error) => console.log(error));
-    },
-    async addRecipe(recipe: Recipe) {
-      await axios.post('http://localhost:3000/recipe', recipe)
-          .then(() => console.log('Recipe created successfully'))
-          .catch((error) => console.log(`Error: ${error}`))
-          .finally(() => {
-            this.toggleForm();
-            this.getRecipes();
-          });
-    },
-    async deleteRecipe(id: string) {
-      await axios.delete('http://localhost:3000/recipe', {data: {id: id}})
-          .then(() => console.log(`Recipe ${id} deleted successfully`))
-          .catch((error) => console.log(`Error: ${error}`))
-          .finally(() => this.getRecipes());
-    },
-    toggleForm(): void {
-      this.showModal = !this.showModal;
-    },
-    setSearchTerm(searchTerm: string) {
-      this.searchTerm = searchTerm;
-    },
-  },
-  created() {
-    this.getRecipes()
-  },
-  computed: {
-    recipeListFiltered(): Recipe[] {
-      if (!this.searchTerm) {
-        return this.recipes;
-      }
-      return this.recipes.filter((recipe: Recipe) => {
-        return (
-            recipe.title.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-            recipe.ingredients
-                .map((ingredient: string) => ingredient.toLowerCase())
-                .includes(this.searchTerm.toLowerCase()));
+const addRecipe = async (recipe: Recipe): Promise<void> => {
+  await axios.post('http://localhost:3000/recipe', recipe)
+      .then(() => console.log('Recipe created successfully'))
+      .catch((error) => console.log(`Error: ${error}`))
+      .finally(() => {
+        toggleForm();
+        getRecipes();
       });
-    },
-  },
-  data(): ComponentData {
-    return {
-      showModal: false,
-      searchTerm: '',
-      recipes: [],
-    }
+}
+
+const deleteRecipe = async (recipeId: string): Promise<void> => {
+  await axios.delete('http://localhost:3000/recipe', {data: {id: recipeId}})
+      .then(() => console.log(`Recipe ${recipeId} deleted successfully`))
+      .catch((error) => console.log(`Error: ${error}`))
+      .finally(() => getRecipes());
+}
+
+const toggleForm = (): void => {
+  showModal.value = !showModal.value
+};
+
+const setSearchTerm = (value: string): void => {
+  searchTerm.value = value
+};
+
+const filterRecipeList = (): Recipe[] => {
+  if (searchTerm.value) {
+    let foundBy = (recipe: Recipe): [boolean, boolean] => ([
+      recipe.title.toLowerCase().includes(searchTerm.value.toLowerCase()),
+      recipe.ingredients.map((i) => i.toLowerCase()).includes(searchTerm.value.toLowerCase())
+    ]);
+    return recipes.value.filter((recipe: Recipe) => foundBy(recipe)[0] || foundBy(recipe)[1]);
+  } else {
+    return [];
   }
-})
+}
+
 </script>
 
 <style lang="scss">

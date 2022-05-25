@@ -16,16 +16,15 @@
 </template>
 
 <script setup lang="ts">
-import {ref, watch} from "vue";
+import {Ref, ref, watch} from "vue";
 
-let search = ref('');
+let search: Ref<string> = ref('');
 
 const emit = defineEmits(['search','show-form']);
+const clearSearch = (): string => search.value = '';
+const showForm = (): void => emit('show-form');
 
-const clearSearch = () => search.value = '';
-const showForm = () => emit('show-form');
-
-watch( search, async (newValue) => emit('search',newValue));
+watch( search, async (newValue): Promise<void> => emit('search',newValue));
 
 </script>
 
