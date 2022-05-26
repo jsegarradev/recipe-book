@@ -44,3 +44,8 @@ npm run build
 ```sh
 npm run lint
 ```
+
+https://vuejs.org/guide/typescript/overview.html
+https://github.com/vuejs/create-vue
+https://www.npmjs.com/package/vue-tsc
+https://pinia.vuejs.org/getting-started.html#what-is-a-store
