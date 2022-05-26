@@ -1,6 +1,6 @@
 <template>
   <div class="recipe-list">
-    <RecipeCard v-for="recipe in props.recipeList"
+    <RecipeCard v-for="recipe in recipeList"
                 :recipe="recipe"
                 :key="recipe.id"
                 v-on:delete-recipe="deleteRecipe"></RecipeCard>
@@ -8,6 +8,7 @@
 </template>
 
 <script setup lang="ts">
+import RecipeCard from "./RecipeCard.vue"
 import {Recipe} from "@/model/Recipe";
 
 interface Props {

@@ -1,30 +1,30 @@
 <template>
-  <div class="recipe" :class="{featured: props.recipe.featured}">
-    <button v-on:click="deleteRecipe(props.recipe.id)" class="delete-recipe">
+  <div class="recipe" :class="{featured: recipe.featured}">
+    <button v-on:click="deleteRecipe(recipe.id)" class="delete-recipe">
       <img src="../assets/delete-button.svg">
     </button>
-    <h2 class="recipe-title">{{ props.recipe.title }}</h2>
+    <h2 class="recipe-title">{{ recipe.title }}</h2>
     <div class="recipe-image">
-      <img :src="props.recipe.imageUrl"/>
+      <img :src="recipe.imageUrl"/>
     </div>
     <div class="recipe-info">
       <div class="recipe-info-item">
         <span class="recipe-info-label">Portions</span>
-        <span class="recipe-info-value">{{ props.recipe.servings }}</span>
+        <span class="recipe-info-value">{{ recipe.servings }}</span>
       </div>
       <div class="recipe-info-item">
         <span class="recipe-info-label">Preparation time</span>
-        <span class="recipe-info-value">{{ props.recipe.time }}</span>
+        <span class="recipe-info-value">{{ recipe.time }}</span>
       </div>
       <div class="recipe-info-item">
         <span class="recipe-info-label">Difficulty</span>
-        <span class="recipe-info-value">{{ props.recipe.difficulty }}</span>
+        <span class="recipe-info-value">{{ recipe.difficulty }}</span>
       </div>
     </div>
     <div class="recipe-ingredients">
       <h3 class="recipe-ingredients-title">Ingredients</h3>
       <ul class="recipe-ingredients-list">
-        <li v-for="item in props.recipe.ingredients" :key="item">
+        <li v-for="item in recipe.ingredients" :key="item">
           {{ item }}
         </li>
       </ul>
@@ -32,7 +32,7 @@
     <div class="recipe-directions">
       <h3 class="recipe-directions-title">Directions</h3>
       <ul class="recipe-directions-list">
-        <li v-for="item in props.recipe.directions" :key="item">
+        <li v-for="item in recipe.directions" :key="item">
           {{ item }}
         </li>
       </ul>

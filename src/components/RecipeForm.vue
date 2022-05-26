@@ -10,7 +10,7 @@
       <div class="error" v-if="error">
         The fields name, ingredients and directions are required.
       </div>
-      <form v-on:submit.prevent="addRecipe" id="form">
+      <form v-on:submit.prevent="submitForm" id="form">
         <div class="recipe-form-item">
           <label for="title">Title:</label><br>
           <input type="text" id="title" name="title" v-model="recipe.title">
@@ -83,6 +83,14 @@ const error: Ref<boolean> = ref(false);
 
 const emit = defineEmits(['add-recipe', 'close-modal']);
 
+const submitForm = (): void => {
+  validateForm();
+  if(!error.value){
+    saveRecipe();
+    resetRecipe();
+  }
+}
+
 const validateForm = (): void => {
   error.value = (
       recipe.value.title.length === 0 ||
@@ -90,15 +98,11 @@ const validateForm = (): void => {
       recipe.value.directions.length === 0);
 }
 
-const addRecipe = (): void => {
-  validateForm();
-  if (!error.value) {
-    recipe.value.id = uuid();
-    recipe.value.ingredients = rawIngredients.value.split(',');
-    recipe.value.directions = rawDirections.value.split(',');
-    emit('add-recipe', recipe.value);
-    resetRecipe();
-  }
+const saveRecipe = (): void => {
+  recipe.value.id = uuid();
+  recipe.value.ingredients = rawIngredients.value.split(',');
+  recipe.value.directions = rawDirections.value.split(',');
+  emit('add-recipe', recipe.value);
 }
 
 const resetRecipe = (): void => {

@@ -6,9 +6,9 @@
     </div>
 
     <SearchBar v-on:showForm="toggleForm"
-               v-on:search="setSearchTerm"/>
+               v-on:search="filterRecipeList"/>
 
-    <RecipeList :recipeList="filterRecipeList"
+    <RecipeList :recipeList="filteredRecipes"
                 @delete-recipe="deleteRecipe"/>
 
     <RecipeForm v-if="showModal"
@@ -27,20 +27,17 @@ import axios from "axios";
 
 const showModal: Ref<boolean> = ref(false);
 
-const searchTerm: Ref<string> = ref('');
 const recipes: Ref<Recipe[]> = ref([]);
+const filteredRecipes: Ref<Recipe[]> = ref([]);
 
 onMounted(async () => {
-  console.log("aaaa");
   await getRecipes();
+  filterRecipeList('');
 });
 
 const getRecipes = async (): Promise<void> => {
   await axios.get('http://localhost:3000/recipes')
-      .then((response) => {
-        recipes.value = response.data.recipes;
-        console.log(recipes.value)
-      })
+      .then((response) => recipes.value = response.data.recipes)
       .catch((error) => console.log(error));
 }
 
@@ -65,21 +62,20 @@ const toggleForm = (): void => {
   showModal.value = !showModal.value
 };
 
-const setSearchTerm = (value: string): void => {
-  searchTerm.value = value
-};
-
-const filterRecipeList = (): Recipe[] => {
-  if (searchTerm.value) {
-    let foundBy = (recipe: Recipe): [boolean, boolean] => ([
-      recipe.title.toLowerCase().includes(searchTerm.value.toLowerCase()),
-      recipe.ingredients.map((i) => i.toLowerCase()).includes(searchTerm.value.toLowerCase())
-    ]);
-    return recipes.value.filter((recipe: Recipe) => foundBy(recipe)[0] || foundBy(recipe)[1]);
+const filterRecipeList = (search: string): void => {
+  if(search){
+    filteredRecipes.value = recipes.value;
+    filteredRecipes.value = filteredRecipes.value
+        .filter((recipe: Recipe) => searchBy(recipe,search)[0] || searchBy(recipe,search)[1]);
   } else {
-    return [];
+    filteredRecipes.value = recipes.value;
   }
 }
+
+const searchBy = (recipe: Recipe, search:string): [boolean, boolean] => ([
+  recipe.title.toLowerCase().includes(search.toLowerCase()),
+  recipe.ingredients.map((i) => i.toLowerCase()).includes(search.toLowerCase())
+]);
 
 </script>
 
