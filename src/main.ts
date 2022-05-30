@@ -11,6 +11,7 @@ const app = createApp(App)
 app.use(createPinia())
 app.use(router)
 app.use(PrimeVue)
-app.component('p-button',Button)
 
 app.mount('#app')
+
+app.component('p-button',Button)
