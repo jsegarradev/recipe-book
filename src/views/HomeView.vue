@@ -10,10 +10,14 @@
 
 <script setup lang="ts">
 import {addressBookService} from "@/services/address-book.service";
-import {Ref, ref} from "vue";
+import {onMounted, ref} from "vue";
 import type {Address} from "@/model/Address";
+import {Ref} from "vue";
 
-const addresses: Ref<Address[]> = ref([])
+const addresses: Address[] = ref([])
+
+onMounted( async () => await loadAddresses());
+
 const loadAddresses = async () => {
   addresses.value = await addressBookService.getAddresses();
 }

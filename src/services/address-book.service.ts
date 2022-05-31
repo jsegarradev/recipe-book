@@ -9,9 +9,9 @@ class AddressBookService extends AbstractApiService {
     getAddresses = () => {
         const params = {}
         return this.http
-            .get('',{params: params})
-            .then()
-            .catch((error) => console.log(error))
+            .get('https://localhost:3001/addresses',{params: params})
+            .then(this.handleResponse.bind(this))
+            .catch(this.handleError.bind(this))
     }
 
 }
